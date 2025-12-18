@@ -29,7 +29,7 @@ class AudioPlayerWindow(QMainWindow):
         Пользовательский интерфейс.
         """
 
-        self.resize(1200, 700)
+        self.resize(960, 640)
         self.setWindowTitle('Audioplayer')
             
         central_widget = QWidget()
@@ -96,7 +96,9 @@ class AudioPlayerWindow(QMainWindow):
         player_layout = QHBoxLayout(player_controls)
             
         self.pause_btn = QPushButton("Pause")
+        self.pause_btn.setEnabled(False)
         self.resume_btn = QPushButton("Resume")
+        self.resume_btn.setEnabled(False)
             
         self.pause_btn.clicked.connect(self.player.pause)
         self.resume_btn.clicked.connect(self.player.play)
@@ -141,20 +143,16 @@ class AudioPlayerWindow(QMainWindow):
             QMessageBox.warning(self, "Error", f"This path doesn't exist: {path}")
             return
         
-        try:
-            self.iterator = FilePathIterator(annotation=path)
-            self.file_label.setText(f".csv file: {os.path.basename(path)}")
+        self.iterator = FilePathIterator(annotation=path)
+        self.file_label.setText(f".csv file: {os.path.basename(path)}")
             
-            self.setup_table()
+        self.setup_table()
             
-            self.iterator.index = 0
-            self.table.selectRow(self.iterator.index)
+        self.iterator.index = 0
+        self.table.selectRow(self.iterator.index)
             
-            self.play_btn.setEnabled(True)
-            self.next_btn.setEnabled(True)
-            
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to upload: {str(e)}")
+        self.play_btn.setEnabled(True)
+        self.next_btn.setEnabled(True)
 
 
     def setup_table(self):
@@ -196,9 +194,8 @@ class AudioPlayerWindow(QMainWindow):
         Воспроизведение выбранного файла.
         """
 
-        if self.iterator.index < 0 or self.iterator.index >= len(self.iterator.paths):
-            QMessageBox.warning(self, "Error", "The file for playback is not selected")
-            return
+        self.pause_btn.setEnabled(True)
+        self.resume_btn.setEnabled(True)
         
         file_path = next(self.iterator)
         self.iterator.index -= 1
@@ -230,7 +227,7 @@ class AudioPlayerWindow(QMainWindow):
 
 
 def main():
-    app = QApplication(sys.argv)
+    app = QApplication([])
     
     window = AudioPlayerWindow()
     window.show()
